@@ -7,23 +7,35 @@ body {
   margin: 60px;
 }
 
-.sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-right: 80px;
-  margin-top: 30px;
+
+.logo-container {
+  position: absolute;
+  top: 10px; /* Ajusta la distancia desde arriba */
+  left: 10px; /* Ajusta la distancia desde la izquierda */
+  z-index: 1000;
 }
 
+
 .logo {
-  width: 380px; /* Ajusta el tamaño según necesites */
+  width: 300px; /* Ajusta el tamaño según necesites */
   height: auto;
   display: block;
   padding-top: 0px;
   right: 10%;
-  margin-bottom: 70px;
-  margin-left: -55px;
+  margin-bottom: 30px;
+  margin-left: -10px;
 }
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-right: 10px;
+  margin-right: 160px;
+  margin-top: 160px;
+}
+
+
 
 .menu-sidebar {
   background-color: #d3d3d3;
@@ -36,6 +48,7 @@ body {
   width: 180px;
   text-align: left;
   margin-top: 10px;
+  margin-left: 5px;
 }
 
 .form-content {

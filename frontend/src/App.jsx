@@ -6,17 +6,16 @@ const App = () => {
   const [fincas, setFincas] = useState([]);
   const [form, setForm] = useState({
     Finca: "",
-    Ubicacion: "",
-    Total_De_Hectareas: "",
     Propietario: "",
-    Dron_Nombre: "",
-    Fecha_Inicio: "",
+    Fecha_Inicial: "",
     Fecha_Final: "",
     Estado: "",
     Duracion: "",
+    Progreso: "",
     Dias_Completados: "",
     Hectareas_Terminadas: "",
-    Fecha: "",
+    Avance: "",
+    Mes: "",
   });
 
   
@@ -52,30 +51,26 @@ const App = () => {
         apellidos,
       });
       
-      const dronResponse = await axios.post("http://localhost:5000/dron", {
-        nombre: form.Dron_Nombre,
-      });
 
       const fincaResponse = await axios.post("http://localhost:5000/finca", {
         nombre: form.Finca,
-        ubicacion: form.Ubicacion,
-        total_hectareas: form.Total_De_Hectareas,
         fk_persona: personaResponse.data.id,
-        fk_dron: dronResponse.data.id,
       });
       
       const trabajoResponse = await axios.post("http://localhost:5000/trabajo", {
-        fecha_inicio: form.Fecha_Inicio,
+        fecha_inicio: form.Fecha_Inicial,
         fecha_final: form.Fecha_Final,
         estado: form.Estado,
         duracion: form.Duracion,
+        progreso: form.Progreso,
+        avance_total: form.Avance,
         fk_finca: fincaResponse.data.id,
       });
       
       const avanceResponse = await axios.post("http://localhost:5000/avance", {
         dias_completados: form.Dias_Completados,
         hectareas_terminadas: form.Hectareas_Terminadas,
-        fecha: form.Fecha,
+        mes: form.Mes,
         fk_trabajo: trabajoResponse.data.id,
       });
 
@@ -110,29 +105,25 @@ const App = () => {
     setForm({
       fk_finca: finca.id,
       Finca: finca.nombre,
-      Ubicacion: finca.ubicacion,
-      Total_De_Hectareas: finca.total_hectareas,
       
       // Capturar ID y nombre de la persona
       fk_persona: finca.fk_persona, 
       Propietario: finca.persona_nombre_completo,
   
-      // Capturar ID y nombre del dron
-      fk_dron: finca.fk_dron, 
-      Dron_Nombre: finca.dron_nombre,
-  
       // Capturar datos del trabajo
       fk_trabajo: finca.trabajos?.[0]?.id || "",
-      Fecha_Inicio: finca.trabajos?.[0]?.fecha_inicio || "",
+      Fecha_Inicial: finca.trabajos?.[0]?.fecha_inicio || "",
       Fecha_Final: finca.trabajos?.[0]?.fecha_final || "",
       Estado: finca.trabajos?.[0]?.estado || "",
       Duracion: finca.trabajos?.[0]?.duracion || "",
+      Progreso: finca.trabajos?.[0]?.progreso || "",
+      Avance: finca.trabajos?.[0]?.avance_total || "",
   
       // Capturar datos del avance
       fk_avance: finca.trabajos?.[0]?.avances?.[0]?.id || "",
       Dias_Completados: finca.trabajos?.[0]?.avances?.[0]?.dias_completados || "",
       Hectareas_Terminadas: finca.trabajos?.[0]?.avances?.[0]?.hectareas_terminadas || "",
-      Fecha: finca.trabajos?.[0]?.avances?.[0]?.fecha || "",
+      Mes: finca.trabajos?.[0]?.avances?.[0]?.mes || "",
     });
   };
   
@@ -153,10 +144,7 @@ const App = () => {
       // Actualizar finca
       await axios.put(`http://localhost:5000/finca/${form.fk_finca}`, {
         nombre: form.Finca,
-        ubicacion: form.Ubicacion,
-        total_hectareas: form.Total_De_Hectareas,
         fk_persona: form.fk_persona || null,  // Si no hay persona, enviar NULL
-        fk_dron: form.fk_dron || null,        // Si no hay dron, enviar NULL
       });
   
       // Actualizar persona solo si hay ID de persona
@@ -182,25 +170,17 @@ const App = () => {
         }
       }
       
-      
-  
-      // Actualizar dron solo si hay ID de dron
-      if (form.fk_dron) {
-        await axios.put(`http://localhost:5000/dron/${form.fk_dron}`, {
-          nombre: form.Dron_Nombre,
-        });
-      }
-  
-      
-      
+ 
   
       // Actualizar trabajo solo si hay ID de trabajo
       if (form.fk_trabajo) {
         await axios.put(`http://localhost:5000/trabajo/${form.fk_trabajo}`, {
-          fecha_inicio: form.Fecha_Inicio,
+          fecha_inicio: form.Fecha_Inicial,
           fecha_final: form.Fecha_Final,
           estado: form.Estado,
           duracion: form.Duracion,
+          progreso: form.Progreso,
+          avance_total: form.Avance,
           fk_finca: form.fk_finca,
         });
       }
@@ -210,7 +190,7 @@ const App = () => {
         await axios.put(`http://localhost:5000/avance/${form.fk_avance}`, {
           dias_completados: form.Dias_Completados,
           hectareas_terminadas: form.Hectareas_Terminadas,
-          fecha: form.Fecha,
+          mes: form.Mes,
           fk_trabajo:form.fk_trabajo,
         });
       }
@@ -227,50 +207,58 @@ const App = () => {
   const handleNew = () => {
     setForm({
       Finca: "",
-      Ubicacion: "",
-      Total_De_Hectareas: "",
       Propietario: "",
-      Dron_Nombre: "",
-      Fecha_Inicio: "",
+      Fecha_Inicial: "",
       Fecha_Final: "",
       Estado: "",
       Duracion: "",
+      Progreso: "",
       Dias_Completados: "",
       Hectareas_Terminadas: "",
-      Fecha: "",
+      Avance: "",
+      Mes: "",
     });
   
     // Esperar un breve momento para asegurar que el estado se actualiza y luego enfocar el primer input
     setTimeout(() => {
-      document.getElementById("Nombre")?.focus();
+      document.getElementById("Finca")?.focus();
     }, 100);
   };
 
   const handleClean = () => {
     setForm({
       Finca: "",
-      Ubicacion: "",
-      Total_De_Hectareas: "",
       Propietario: "",
-      Dron_Nombre: "",
-      Fecha_Inicio: "",
+      Fecha_Inicial: "",
       Fecha_Final: "",
       Estado: "",
       Duracion: "",
+      Progreso: "",
       Dias_Completados: "",
       Hectareas_Terminadas: "",
-      Fecha: "",
+      Avance: "",
+      Mes: "",
     });
   };
   
   
 
   return (
+
+
     
+
+
     <div className="container">
+
+      <div className="logo-container">
+      <img src="/logoTecnovant.png" alt="Logo" className="logo" />
+      </div>
+
+
       <div className="sidebar">
         {/* Logo en la barra lateral */}
-        <img src="/logoTecnovantSinFondo.png" alt="Logo" className="logo" />
+        
         <button className="menu-sidebar" onClick={handleUpdate }>
           Actualizar
         </button>
@@ -290,17 +278,16 @@ const App = () => {
             <thead>
               <tr>
                 <th>Finca</th>
-                <th>Número de Hectáreas</th>
-                <th>Ubicación</th>
                 <th>Propietario</th>
-                <th>Dron</th>
                 <th>Fecha Inicial</th>
                 <th>Duración</th>
+                <th>Progreso</th>
                 <th>Fecha Final</th>
-                <th>Estado</th>
+                <th>Estado</th>                                
                 <th>Días Completados</th>
-                <th>Hectáreas Terminadas</th>
-                <th>Fecha (Avance)</th>
+                <th>Hectáreas Terminadas</th> 
+                <th>Avance</th>              
+                <th>Mes</th>
                 <th>Acciones</th>
               </tr>
             </thead>
@@ -308,17 +295,16 @@ const App = () => {
               {fincas.map((finca) => (
                 <tr key={finca.id} onClick={() => handleRowClick(finca)}>
                   <td>{finca.nombre}</td>
-                  <td>{finca.total_hectareas}</td>
-                  <td>{finca.ubicacion}</td>
                   <td>{finca.persona_nombre_completo}</td>
-                  <td>{finca.dron_nombre}</td>
                   <td>{finca.trabajos?.map((trabajo) => trabajo.fecha_inicio).join(", ")}</td>
                   <td>{finca.trabajos?.map((trabajo) => trabajo.duracion).join(", ")}</td>
+                  <td>{finca.trabajos?.map((trabajo) => trabajo.progreso).join(", ")}</td>
                   <td>{finca.trabajos?.map((trabajo) => trabajo.fecha_final).join(", ")}</td>
-                  <td>{finca.trabajos?.map((trabajo) => trabajo.estado).join(", ")}</td>
+                  <td>{finca.trabajos?.map((trabajo) => trabajo.estado).join(", ")}</td>                                    
                   <td>{finca.trabajos?.flatMap((trabajo) => trabajo.avances?.map((avance) => avance.dias_completados)).join(", ")}</td>
                   <td>{finca.trabajos?.flatMap((trabajo) => trabajo.avances?.map((avance) => avance.hectareas_terminadas)).join(", ")}</td>
-                  <td>{finca.trabajos?.flatMap((trabajo) => trabajo.avances?.map((avance) => avance.fecha)).join(", ")}</td>
+                  <td>{finca.trabajos?.map((trabajo) => trabajo.avance_total).join(", ")}</td>
+                  <td>{finca.trabajos?.flatMap((trabajo) => trabajo.avances?.map((avance) => avance.mes)).join(", ")}</td>
                   <td>
                     <button onClick={() => handleDelete(finca.id)}>Eliminar</button>
                   </td>
@@ -330,14 +316,14 @@ const App = () => {
         <div className="frame">
           <form className="form-grid" onSubmit={handleSubmit}>
             {Object.keys(form)
-      
+              .filter((key) => !["fk_finca", "fk_persona", "fk_trabajo", "fk_avance"].includes(key))
               .map((key) => (
                 <div className="form-group" key={key}>
                   <label>{key.replace(/_/g, " ")}</label>
                   <input
                     type={key.includes("Fecha") ? "date" : "text"}
                     name={key}
-                    id={key === "Nombre" ? "Nombre" : undefined}
+                    id={key === "Finca" ? "Finca" : undefined}
                     value={form[key]}
                     onChange={handleChange}
                   />
