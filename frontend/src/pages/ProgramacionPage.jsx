@@ -1,10 +1,14 @@
 
 import React, { useState, useEffect } from "react";
+// Axios para hacer solicitudes HTTP al backend
 import axios from "axios";
+// Componente de interfaz visual del formulario de programación
 import ProgramacionForm from "../components/ProgramacionForm";
-import { v4 as uuidv4 } from "uuid";
+// Importación de estilos CSS
 import "../styles/index.css";
 
+
+// Estado para almacenar la lista de fincas y los datos del formulario
 const ProgramacionPage = () => {
   const [fincas, setFincas] = useState([]);
   const [form, setForm] = useState({
@@ -21,10 +25,12 @@ const ProgramacionPage = () => {
     Factura: "",
   });
 
+  // Al montar el componente, obtenemos las fincas existentes desde el backend
   useEffect(() => {
     fetchFincas();
   }, []);
 
+  // Función para obtener los datos desde el backend
   const fetchFincas = async () => {
     try {
       const response = await axios.get("http://localhost:5000/programacion/programaciones");
@@ -34,6 +40,7 @@ const ProgramacionPage = () => {
     }
   };
 
+  // Función para manejar los cambios en los campos del formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
   
@@ -56,26 +63,31 @@ const ProgramacionPage = () => {
   };
   
 
+  // Función para insertar datos nuevos en todas las tablas relacionadas con formulario2
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const origen = "formulario2";
     try {
+      // Separamos nombres completo en nombres y apellidos
       const nombreArray = form.Cliente.trim().split(" ");
       const nombres = nombreArray.slice(0, -1).join(" ") || form.Cliente;
       const apellidos = nombreArray.slice(-1).join(" ") || "";
 
+      // Creamos una persona
       const personaResponse = await axios.post("http://localhost:5000/programacion/personas", {
         nombres,
         apellidos,
         origen,
       });
 
+      // Creamos un dron
       const dronResponse = await axios.post("http://localhost:5000/programacion/dron", {
         nombre: form.Dron,
         origen,
       });
 
+      // Creamos una finca asociada a la persona y al dron
       const fincaResponse = await axios.post("http://localhost:5000/programacion/finca", {
         nombre: form.Finca,
         area: form.Area,
@@ -84,6 +96,7 @@ const ProgramacionPage = () => {
         fk_dron: dronResponse.data.id,
       });
       
+      // Creamos una factura
       const facturaResponse = await axios.post("http://localhost:5000/programacion/factura", {
         corte_facturacion: form.Corte_Facturacion,
         precio: form.Precio,
@@ -92,6 +105,7 @@ const ProgramacionPage = () => {
         origen,
       });
 
+      // Creamos un trabajo asociado a la finca y a la factura
       const trabajoResponse = await axios.post("http://localhost:5000/programacion/trabajo", {
         fecha_inicio: form.Fecha_Programacion,
         fecha_final: form.Fecha_Ejecucion,
@@ -100,6 +114,7 @@ const ProgramacionPage = () => {
         fk_factura: facturaResponse.data.id,
       });
 
+      // Creamos un avance asociado al trabajo
       const avanceResponse = await axios.post("http://localhost:5000/programacion/avance", {
         mes: form.Mes,
         origen,
@@ -113,6 +128,7 @@ const ProgramacionPage = () => {
     }
   };
 
+  // Función para actualizar los datos del formulario
   const handleUpdate = async () => {
     try {
       if (!form.fk_finca) {
@@ -185,6 +201,7 @@ const ProgramacionPage = () => {
     }
   };
 
+  // Función para eliminar una finca y sus datos relacionados
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm("¿Estás seguro de eliminar esta programación?");
     if (!confirmDelete) return;
@@ -199,6 +216,7 @@ const ProgramacionPage = () => {
     }
   };
 
+  // Carga los datos de un registro seleccionado en el formulario
   const handleRowClick = (finca) => {
     setForm({
       fk_finca: finca.id,
@@ -222,6 +240,7 @@ const ProgramacionPage = () => {
 
   };
 
+  // Función para limpiar el formulario y genera un enfoque en el campo "Finca"
   const handleNew = () => {
     setForm({
       Finca: "",
@@ -243,11 +262,12 @@ const ProgramacionPage = () => {
   };
 
   
-
+  // Función para limpiar el formulario
   const handleClean = () => {
     handleNew();
   };
 
+  // Renderiza el componente ProgramacionForm con las propiedades necesarias
   return (
     <ProgramacionForm
       form={form}
@@ -263,4 +283,5 @@ const ProgramacionPage = () => {
   );
 };
 
+// Exporta el componente ProgramacionPage
 export default ProgramacionPage;
